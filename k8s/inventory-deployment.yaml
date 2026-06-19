@@ -17,6 +17,7 @@ spec:
       containers:
         - name: inventory
           image: capstoneproject-inventory-service:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5002
           env:
