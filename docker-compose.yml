@@ -74,10 +74,12 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "3000:3000"
+      - "3000:80" # map host 3000 to container 80 (nginx)
     depends_on:
-      - product-service
-      - order-service
+      product-service:
+        condition: service_healthy
+      order-service:
+        condition: service_healthy
 
 volumes:
   mysql-data:

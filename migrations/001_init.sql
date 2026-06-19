@@ -1,6 +1,4 @@
-
 CREATE DATABASE IF NOT EXISTS ecommerce;
-
 USE ecommerce;
 
 CREATE TABLE IF NOT EXISTS products (

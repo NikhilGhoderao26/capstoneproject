@@ -34,6 +34,8 @@ function connectWithRetry() {
 }
 connectWithRetry();
 
+app.get("/health", (req, res) => res.json({ status: 'ok' }))
+
 app.get("/products",(req,res)=>{
   db.query("SELECT * FROM products",(err,result)=>{
     if(err) throw err
