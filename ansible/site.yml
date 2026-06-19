@@ -1,0 +1,96 @@
+---
+- name: Prepare servers for capstoneproject
+  hosts: servers
+  become: true
+  vars:
+    deploy_compose: false   # set to true to also clone repo and run docker compose up
+    install_monitoring: false
+    repo_url: "https://github.com/NikhilGhoderao26/capstoneproject.git"
+    repo_path: /opt/capstoneproject
+
+  tasks:
+    - name: Ensure apt cache is up to date
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install required packages
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+          - git
+        state: present
+
+    - name: Download Docker GPG key to keyrings
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /usr/share/keyrings/docker-archive-keyring.gpg
+        mode: '0644'
+
+    - name: Add Docker apt repository (signed-by keyring)
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable"
+        state: present
+
+    - name: Install docker (docker.io) and containerd
+      apt:
+        name:
+          - docker.io
+          - containerd
+        state: present
+
+    - name: Ensure docker service is started and enabled
+      service:
+        name: docker
+        state: started
+        enabled: true
+      when: not ansible_check_mode
+
+    - name: Create docker group and add current user
+      group:
+        name: docker
+        state: present
+      when: not ansible_check_mode
+
+    - name: Add ansible user to docker group
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: true
+      when: not ansible_check_mode
+
+    - name: Install docker-compose plugin (compose v2)
+      shell: |
+        mkdir -p ~/.docker/cli-plugins
+        curl -SL "https://github.com/docker/compose/releases/download/v2.23.3/docker-compose-$(uname -s)-$(uname -m)" -o ~/.docker/cli-plugins/docker-compose
+        chmod +x ~/.docker/cli-plugins/docker-compose
+      args:
+        creates: ~/.docker/cli-plugins/docker-compose
+      when: not ansible_check_mode
+
+    - name: Optionally clone repository
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ repo_path }}"
+        version: main
+      when: deploy_compose and not ansible_check_mode
+
+    - name: Optionally start compose stack
+      shell: docker compose up -d
+      args:
+        chdir: "{{ repo_path }}"
+      when: deploy_compose and not ansible_check_mode
+
+    - name: Include compose service role
+      include_role:
+        name: compose_service
+      when: deploy_compose and not ansible_check_mode
+
+    - name: Include monitoring role
+      include_role:
+        name: monitoring
+      when: install_monitoring and not ansible_check_mode

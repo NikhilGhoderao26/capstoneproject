@@ -1,0 +1,48 @@
+---
+- name: Download node_exporter
+  get_url:
+    url: https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz
+    dest: /tmp/node_exporter.tar.gz
+    mode: '0644'
+  args:
+    creates: /tmp/node_exporter.tar.gz
+
+- name: Extract node_exporter
+  unarchive:
+    src: /tmp/node_exporter.tar.gz
+    dest: /opt
+    remote_src: yes
+    creates: /opt/node_exporter-1.6.1.linux-amd64
+
+- name: Create symlink for node_exporter
+  file:
+    src: /opt/node_exporter-1.6.1.linux-amd64/node_exporter
+    dest: /usr/local/bin/node_exporter
+    state: link
+
+- name: Template node_exporter systemd unit
+  copy:
+    dest: /etc/systemd/system/node_exporter.service
+    content: |
+      [Unit]
+      Description=Prometheus Node Exporter
+      After=network.target
+
+      [Service]
+      Type=simple
+      ExecStart=/usr/local/bin/node_exporter
+      Restart=always
+
+      [Install]
+      WantedBy=multi-user.target
+  notify: Restart node_exporter
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes
+
+- name: Ensure node_exporter enabled and started
+  systemd:
+    name: node_exporter
+    enabled: yes
+    state: started
