@@ -1,5 +1,5 @@
 # Override to expose MySQL on the host. Use only if you stop your host MySQL service.
-# To enable: stop local mysqld, then run `docker compose up --build -d` (compose merges this file automatically).
+# To enable: stop local mysqld, then run `docker compose -f docker-compose.yml -f docker-compose.expose-mysql.yml up --build -d`
 
 services:
   mysql:

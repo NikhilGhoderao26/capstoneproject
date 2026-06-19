@@ -15,6 +15,7 @@ switch($task){
   'seed-db' {
     # copy migrations and run inside mysql container
     docker cp .\migrations capstoneproject-mysql-1:/migrations
+    docker cp .\scripts capstoneproject-mysql-1:/scripts
     docker exec -i capstoneproject-mysql-1 sh -c '/scripts/apply_migrations.sh'
   }
   default {

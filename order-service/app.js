@@ -38,7 +38,10 @@ app.get("/health", (req, res) => res.json({ status: 'ok' }))
 
 app.get("/orders",(req,res)=>{
  db.query("SELECT * FROM orders",(err,result)=>{
-   if(err) throw err
+   if(err){
+     console.error('DB error on /orders', err.message || err)
+     return res.status(500).json({ error: 'database error' })
+   }
    res.json(result)
  })
 })
@@ -48,7 +51,10 @@ app.post("/orders",(req,res)=>{
 
  db.query("INSERT INTO orders(product_id,quantity,status) VALUES (?,?,?)",
  [product_id,quantity,"CREATED"],(err)=>{
-   if(err) throw err
+   if(err){
+     console.error('DB error on POST /orders', err.message || err)
+     return res.status(500).json({ error: 'database error' })
+   }
    res.json({message:"order created"})
  })
 })
