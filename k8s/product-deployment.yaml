@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: product
-          image: REPLACE_WITH_IMAGE
+          image: capstoneproject-product-service:latest
           ports:
             - containerPort: 5000
           env:

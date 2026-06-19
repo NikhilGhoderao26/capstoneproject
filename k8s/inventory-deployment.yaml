@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: inventory
-          image: REPLACE_WITH_IMAGE
+          image: capstoneproject-inventory-service:latest
           ports:
             - containerPort: 5002
           env:

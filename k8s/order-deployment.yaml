@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: order
-          image: REPLACE_WITH_IMAGE
+          image: capstoneproject-order-service:latest
           ports:
             - containerPort: 5001
           env:
