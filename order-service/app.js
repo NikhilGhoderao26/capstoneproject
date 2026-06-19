@@ -8,10 +8,10 @@ app.use(express.json())
 app.use(cors())
 
 const db=mysql.createConnection({
- host:"mysql",
- user:"root",
- password:"password",
- database:"ecommerce"
+ host: process.env.MYSQL_HOST || "mysql",
+ user: process.env.MYSQL_USER || "root",
+ password: process.env.MYSQL_PASSWORD || "password",
+ database: process.env.MYSQL_DATABASE || "ecommerce"
 })
 
 app.get("/orders",(req,res)=>{
