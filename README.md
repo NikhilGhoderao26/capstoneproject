@@ -80,3 +80,25 @@ Each student must submit:
 • Grafana dashboard screenshots
 • Architecture diagram
 • Working demo of deployed application
+
+## Running with Docker
+
+This repository includes a 'docker-compose.yml' to run MySQL + services + frontend locally. By default the MySQL container does NOT expose host port 3306 to avoid conflicts with a host MySQL server. If you want to expose MySQL on the host (only do this if you stop your local mysqld), enable the override file 'docker-compose.override.yml' (already present) or run with '-f docker-compose.override.yml'.
+
+Examples:
+
+1) Start the stack (recommended default):
+
+`powershell
+docker compose up --build -d
+`
+
+2) If you want MySQL on host port 3306 (stop local MySQL first):
+
+`powershell
+# stop local mysql service first (example):
+# Stop-Service -Name MySQL
+
+docker compose -f docker-compose.yml -f docker-compose.override.yml up --build -d
+`
+
